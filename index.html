@@ -1,19 +1,170 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Hello World!</title>
-  </head>
-  <body>
-    <h1>Hello World!</h1>
-    <!-- All of the Node.js APIs are available in this renderer process. -->
-    We are using Node.js <script>document.write(process.versions.node)</script>,
-    Chromium <script>document.write(process.versions.chrome)</script>,
-    and Electron <script>document.write(process.versions.electron)</script>.
 
-    <script>
-      // You can also require other files to run in this process
-      require('./renderer.js')
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BE</title>
+
+    <style>
+        .leftbox {
+            width: 20%;
+            float: left;
+            margin-left: 2px;
+            background-color: #aadddd;
+        }
+
+        .midbox {
+            width: 70%;
+            float: left;
+            background-color: #429292;
+        }
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.10/js/uikit.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.10/js/uikit-icons.min.js"></script>
+
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="leftbox">
+            <ul class="uk-list uk-list-divider" id="taskGroupList"></ul>
+            <div>
+                <p uk-margin>
+                    <a id="js-group-prompt" class="uk-button uk-button-default" href="#">新增分组</a>
+                </p>
+            </div>
+        </div>
+        <div class="midbox">
+            <div id="taskList"></div>
+            <div>
+                <p uk-margin>
+                    <a id="js-task-prompt" class="uk-button uk-button-default" href="#">新增任务</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <!-- UIkit CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.10/css/uikit.min.css" />
+    <!-- UIkit JS -->
+    <!-- <script src = "./script/data.js" type="text/javascript" /> -->
+    <script type="text/javascript">
+        // You can also require other files to run in this process
+        require('./renderer.js')
+        var PUBLIC_GROUP;
+        var data_module = require('./script/data.js')
+        var initBEWindow = function () {
+            initTaskGroup();
+            initUIPrompt();
+        }
+        function initTaskGroup() {
+            var Groups = data_module.viewTaskGroup();
+            console.log(data_module);
+            var taskGroupTool = document.getElementById("taskGroupList");
+            taskGroupTool.innerHTML="";
+            console.log(Groups);
+            for (var k = 0; k < Groups.length; k++) {
+                li = document.createElement("li");
+                li.setAttribute('onclick', "clickShowTasks('" + Groups[k] + "')")
+                li.textContent = Groups[k];
+                taskGroupTool.appendChild(li);
+                // taskGroupTool.insertAdjacentHTML("afterbegin", "<li onclick='clickShowTasks(\""+Groups[k]+"\")\">" + Groups[k] + "</li>");
+            }
+            console.log("加载完成23");
+            // taskGroupTool.appendChild()
+
+        }
+        function initUIPrompt() {
+            UIkit.util.on('#js-group-prompt', 'click', function (e) {
+                e.preventDefault();
+                e.target.blur();
+                UIkit.modal.prompt('Name:', 'group Name').then(function (name) {
+                    console.log('Prompted:', name)
+                    if (name == undefined || name == null) return;
+                    // 添加组
+                    addGroup(name);
+                });
+            });
+
+            UIkit.util.on('#js-task-prompt', 'click', function (e) {
+                e.preventDefault();
+                e.target.blur();
+                UIkit.modal.prompt('Name:', 'Task name').then(function (name) {
+                    console.log('Prompted:', name)
+                    if (name == undefined || name == null) return;
+                    // 添加任务
+                    addTask(PUBLIC_GROUP, name);
+                });
+            });
+        }
+        window.onload = initBEWindow;
+
+        function clickShowTasks(tg) {
+            //设置公共的tg
+            PUBLIC_GROUP = tg;
+            tasks = data_module.viewTaskByGroupName(tg);
+            console.log(tasks)
+            var taskTool = document.getElementById("taskList");
+            taskTool.innerHTML = "";
+            for (var k = 0; k < tasks.length; k++) {
+                div = document.createElement("div");
+                div.setAttribute('class', "uk-alert-primary")
+                div.setAttribute('uk-alert', true)
+                a = document.createElement("a");
+                a.setAttribute('class', "uk-alert-close")
+                a.setAttribute('uk-close', true)
+                a.setAttribute('onclick', "delTask('" + tg + "'," + tasks[k].key + ")")
+                p = document.createElement("p");
+                p.textContent = tasks[k].value;
+                div.appendChild(a)
+                div.appendChild(p)
+                //    li.textContent = tasks[k].value;
+                taskTool.appendChild(div);
+
+            }
+        }
+
+        function delTask(tg, id) {
+            data_module.delTask(tg, id)
+            clickShowTasks(tg);
+        }
+
+        function addTask(tg, text) {
+            data_module.addTask(tg, text)
+            clickShowTasks(tg);
+        }
+        function addGroup(tg) {
+            data_module.addTaskGroup(tg);
+            initTaskGroup();
+            PUBLIC_GROUP =tg;
+        }
+        // function delGroup(tg) {
+        //     data_module.delTaskGroup(tg);
+        //     initTaskGroup();
+        // }
+
+
+        // function clickShowTasks(tg){
+        //    tasks =  data_module.viewTaskByGroupName(tg);
+        //    console.log(tasks)
+        //    var taskTool = document.getElementById("taskList");
+        //    taskTool.innerHTML="";
+        //     for (var k=0;k<tasks.length;k++) {
+        //        li =  document.createElement("li");
+        //        li.setAttribute('onclick',"clickShowTasks('"+tasks[k].key+"')")
+        //        li.textContent = tasks[k].value;
+        //        taskTool.appendChild(li);
+        //         // taskGroupTool.insertAdjacentHTML("afterbegin", "<li onclick='clickShowTasks(\""+Groups[k]+"\")\">" + Groups[k] + "</li>");
+        //     }
+        // }
     </script>
-  </body>
+
+</body>
+
 </html>
