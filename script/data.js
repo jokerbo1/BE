@@ -1,17 +1,18 @@
 // 主要负责操作xml文件的增删查改 以及新增组
-var dataPath = "./data/task.xml"
+var dataPath = "../data/task.xml"
 var domParser = new DOMParser();
 var taskSuite = "taskSuite";
 var taskGroup = "taskGroup";
 var taskName = "task";
 var fs = require('fs');
+var path = require('path');
 var DATAMODULE ={
 /**
  * 
  * @param {String} tg  任务组名称
  */
 addTaskGroup:function(tg) {
-    text = fs.readFileSync(dataPath)
+    text = fs.readFileSync(path.join(__dirname,dataPath))
     var data = domParser.parseFromString(text, "text/xml");
     var group = data.getElementsByName(tg);
     if (group == undefined || group.length<=0) {
@@ -27,7 +28,7 @@ addTaskGroup:function(tg) {
         node.setAttribute("name", tg+"1")
         rootElement[0].appendChild(node)
     }
-    fs.writeFileSync(dataPath,new XMLSerializer().serializeToString(data))
+    fs.writeFileSync(path.join(__dirname,dataPath),new XMLSerializer().serializeToString(data))
 },
 
 /**
@@ -35,13 +36,13 @@ addTaskGroup:function(tg) {
  * @param {String} tg  根据名称删除任务组
  */
  delTaskGroup:function(tg) {
-    text = fs.readFileSync(dataPath)
+    text = fs.readFileSync(path.join(__dirname,dataPath))
     var data = domParser.parseFromString(text, "text/xml");
     var group = data.getElementsByName(tg);
     if (group != undefined && group.length>0) {
         data.removeChild(group[0]);
     }
-    fs.writeFileSync(dataPath,new XMLSerializer().serializeToString(data))
+    fs.writeFileSync(path.join(__dirname,dataPath),new XMLSerializer().serializeToString(data))
 },
 
 /**
@@ -49,7 +50,7 @@ addTaskGroup:function(tg) {
  */
  viewTaskGroup:function() {
     var list = [];
-    text = fs.readFileSync(dataPath)
+    text = fs.readFileSync(path.join(__dirname,dataPath))
     var data = domParser.parseFromString(text,"text/xml");
     var group = data.getElementsByTagName(taskGroup);
     if (group == undefined || group.length<=0) {
@@ -71,7 +72,7 @@ addTaskGroup:function(tg) {
  * @param {*} task 任务详细内容
  */
  addTask:function(tg, task) {
-    text = fs.readFileSync(dataPath)
+    text = fs.readFileSync(path.join(__dirname,dataPath))
     var data = domParser.parseFromString(text, "text/xml");
     var group = data.getElementsByName(tg);
     if (group == undefined || group.length<=0) {
@@ -80,7 +81,7 @@ addTaskGroup:function(tg) {
     var node = data.createElement(taskName);
     node.textContent = task;
     group[0].appendChild(node)
-    fs.writeFileSync(dataPath,new XMLSerializer().serializeToString(data))
+    fs.writeFileSync(path.join(__dirname,dataPath),new XMLSerializer().serializeToString(data))
 },
 
 /**
@@ -89,7 +90,7 @@ addTaskGroup:function(tg) {
  * @param {*} id 任务id
  */
  delTask:function(tg, id) {
-    text = fs.readFileSync(dataPath)
+    text = fs.readFileSync(path.join(__dirname,dataPath))
     var data = domParser.parseFromString(text, "text/xml");
     var group = data.getElementsByName(tg);
     if (group == undefined || group.length<=0) {
@@ -97,14 +98,14 @@ addTaskGroup:function(tg) {
     }
     task = group[0].getElementsByTagName(taskName)[id];
     group[0].removeChild(task);
-    fs.writeFileSync(dataPath,new XMLSerializer().serializeToString(data))
+    fs.writeFileSync(path.join(__dirname,dataPath),new XMLSerializer().serializeToString(data))
 },
 
 /**
    * 根据任务组展示所有的任务
    */
  viewTaskByGroupName:function(tg) {
-    text = fs.readFileSync(dataPath)
+    text = fs.readFileSync(path.join(__dirname,dataPath))
     var data = domParser.parseFromString(text, "text/xml");
     var group = data.getElementsByName(tg);
     if (group == undefined || group.length<=0) {
