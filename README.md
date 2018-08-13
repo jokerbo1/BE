@@ -9,10 +9,10 @@
 
 ## 打包
 
-1.打包成mac应用
-node ./node_modules/electron-packager/cli.js . BE --platform=darwin
-2.打包成 dmg
-node ./node_modules/electron-installer-dmg/bin/electron-installer-dmg.js ./BE-darwin-x64 BE
+- 打包成mac应用
+## node ./node_modules/electron-packager/cli.js . BE --platform=darwin
+- 打包成 dmg
+## node ./node_modules/electron-installer-dmg/bin/electron-installer-dmg.js ./BE-darwin-x64 BE
 
 ## License
 

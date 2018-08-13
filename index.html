@@ -12,12 +12,21 @@
             float: left;
             margin-left: 2px;
             background-color: #aadddd;
+            align-content: center;
+            text-align: center;
         }
 
         .midbox {
             width: 70%;
             float: left;
             background-color: #429292;
+        }
+
+        /* 按钮居中 */
+
+        #addTask {
+            align-content: center;
+            text-align: center;
         }
     </style>
 
@@ -30,20 +39,20 @@
 
     <div class="container">
         <div class="leftbox">
-            <ul class="uk-list uk-list-divider" id="taskGroupList"></ul>
             <div>
                 <p uk-margin>
                     <a id="js-group-prompt" class="uk-button uk-button-default" href="#">新增分组</a>
                 </p>
             </div>
+            <ul class="uk-list uk-list-divider" id="taskGroupList"></ul>
         </div>
         <div class="midbox">
-            <div id="taskList"></div>
-            <div>
+            <div id="addTask">
                 <p uk-margin>
                     <a id="js-task-prompt" class="uk-button uk-button-default" href="#">新增任务</a>
                 </p>
             </div>
+            <div id="taskList"></div>
         </div>
     </div>
 
@@ -67,13 +76,21 @@
             var Groups = data_module.viewTaskGroup();
             console.log(data_module);
             var taskGroupTool = document.getElementById("taskGroupList");
-            taskGroupTool.innerHTML="";
+            taskGroupTool.innerHTML = "";
             console.log(Groups);
             for (var k = 0; k < Groups.length; k++) {
                 li = document.createElement("li");
                 li.setAttribute('onclick', "clickShowTasks('" + Groups[k] + "')")
                 li.textContent = Groups[k];
+                a = document.createElement("a")
+                a.setAttribute('herf', "#")
+                a.setAttribute('uk-icon', "icon: trash")
+                a.setAttribute('onclick', "delGroup('" + Groups[k] + "')")
+                li.appendChild(a)
+                // lineSplie = document.createElement("hr")
+                // lineSplie.setAttribute("class","uk-divider-small")
                 taskGroupTool.appendChild(li);
+                // taskGroupTool.appendChild(lineSplie); //分隔符
                 // taskGroupTool.insertAdjacentHTML("afterbegin", "<li onclick='clickShowTasks(\""+Groups[k]+"\")\">" + Groups[k] + "</li>");
             }
             console.log("加载完成23");
@@ -116,22 +133,46 @@
                 div = document.createElement("div");
                 div.setAttribute('class', "uk-alert-primary")
                 div.setAttribute('uk-alert', true)
+                span = document.createElement("span");
+                span.setAttribute('uk-icon', "icon:check;")
+                span.setAttribute('class-icon', "uk-margin-small-right")
+                span.setAttribute('onclick', "finishTask('" + tg + "'," + tasks[k].key + ")")
+
                 a = document.createElement("a");
                 a.setAttribute('class', "uk-alert-close")
                 a.setAttribute('uk-close', true)
                 a.setAttribute('onclick', "delTask('" + tg + "'," + tasks[k].key + ")")
                 p = document.createElement("p");
-                p.textContent = tasks[k].value;
+                div.appendChild(span)
                 div.appendChild(a)
                 div.appendChild(p)
+                if (tasks[k].finish) {
+                    p.textContent = "[完成] " + tasks[k].value;
+                    p.setAttribute("style", "text-decoration: line-through;")
+                    taskTool.appendChild(div);
+                } else {
+                    p.textContent = "[未完成] " + tasks[k].value;
+                    firstchild = taskTool.firstChild
+                    if (firstchild == undefined || firstchild == null) {
+                        taskTool.appendChild(div);
+                        continue;
+                    }
+                    taskTool.insertBefore(div, firstchild)
+                }
                 //    li.textContent = tasks[k].value;
-                taskTool.appendChild(div);
+
+
 
             }
         }
 
         function delTask(tg, id) {
             data_module.delTask(tg, id)
+            clickShowTasks(tg);
+        }
+
+        function finishTask(tg, id) {
+            data_module.finishTask(tg, id)
             clickShowTasks(tg);
         }
 
@@ -142,12 +183,12 @@
         function addGroup(tg) {
             data_module.addTaskGroup(tg);
             initTaskGroup();
-            PUBLIC_GROUP =tg;
+            PUBLIC_GROUP = tg;
         }
-        // function delGroup(tg) {
-        //     data_module.delTaskGroup(tg);
-        //     initTaskGroup();
-        // }
+        function delGroup(tg) {
+            data_module.delTaskGroup(tg);
+            initTaskGroup();
+        }
 
 
         // function clickShowTasks(tg){
