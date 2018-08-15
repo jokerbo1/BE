@@ -80,21 +80,15 @@
             console.log(Groups);
             for (var k = 0; k < Groups.length; k++) {
                 li = document.createElement("li");
-                li.setAttribute('onclick', "clickShowTasks('" + Groups[k] + "')")
+                li.setAttribute('onclick', "clickShowTasks(this,'" + Groups[k] + "')")
                 li.textContent = Groups[k];
                 a = document.createElement("a")
                 a.setAttribute('herf', "#")
                 a.setAttribute('uk-icon', "icon: trash")
                 a.setAttribute('onclick', "delGroup('" + Groups[k] + "')")
                 li.appendChild(a)
-                // lineSplie = document.createElement("hr")
-                // lineSplie.setAttribute("class","uk-divider-small")
                 taskGroupTool.appendChild(li);
-                // taskGroupTool.appendChild(lineSplie); //分隔符
-                // taskGroupTool.insertAdjacentHTML("afterbegin", "<li onclick='clickShowTasks(\""+Groups[k]+"\")\">" + Groups[k] + "</li>");
             }
-            console.log("加载完成23");
-            // taskGroupTool.appendChild()
 
         }
         function initUIPrompt() {
@@ -122,7 +116,16 @@
         }
         window.onload = initBEWindow;
 
-        function clickShowTasks(tg) {
+        function clickShowTasks(el,tg) {
+            // 初始化样式
+            if(el!=null){
+                cnodes = el.parentNode.childNodes;
+                for(var i=0;i<cnodes.length;i++){
+                    cnodes[i].setAttribute("style","font-weight:normal;")
+                }
+                el.setAttribute("style","font-weight:bold;color:#2719a0;font-size:25px")
+            }
+        
             //设置公共的tg
             PUBLIC_GROUP = tg;
             tasks = data_module.viewTaskByGroupName(tg);
@@ -168,17 +171,17 @@
 
         function delTask(tg, id) {
             data_module.delTask(tg, id)
-            clickShowTasks(tg);
+            clickShowTasks(null,tg);
         }
 
         function finishTask(tg, id) {
             data_module.finishTask(tg, id)
-            clickShowTasks(tg);
+            clickShowTasks(null,tg);
         }
 
         function addTask(tg, text) {
             data_module.addTask(tg, text)
-            clickShowTasks(tg);
+            clickShowTasks(null,tg);
         }
         function addGroup(tg) {
             data_module.addTaskGroup(tg);
@@ -190,20 +193,6 @@
             initTaskGroup();
         }
 
-
-        // function clickShowTasks(tg){
-        //    tasks =  data_module.viewTaskByGroupName(tg);
-        //    console.log(tasks)
-        //    var taskTool = document.getElementById("taskList");
-        //    taskTool.innerHTML="";
-        //     for (var k=0;k<tasks.length;k++) {
-        //        li =  document.createElement("li");
-        //        li.setAttribute('onclick',"clickShowTasks('"+tasks[k].key+"')")
-        //        li.textContent = tasks[k].value;
-        //        taskTool.appendChild(li);
-        //         // taskGroupTool.insertAdjacentHTML("afterbegin", "<li onclick='clickShowTasks(\""+Groups[k]+"\")\">" + Groups[k] + "</li>");
-        //     }
-        // }
     </script>
 
 </body>

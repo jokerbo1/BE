@@ -117,6 +117,7 @@ finishTask:function(tg, id) {
     }
     task = group[0].getElementsByTagName(taskName)[id];
     task.setAttribute(finishName,true)
+    task.textContent = new Date().toLocaleString() +" "+task.textContent;
     fs.writeFileSync(path.join(__dirname,dataPath),new XMLSerializer().serializeToString(data))
 },
 
