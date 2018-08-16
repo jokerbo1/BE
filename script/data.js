@@ -5,6 +5,7 @@ var taskSuite = "taskSuite";
 var taskGroup = "taskGroup";
 var taskName = "task";
 var finishName = "finish"
+var timeName = "time"
 var fs = require('fs');
 var path = require('path');
 var DATAMODULE ={
@@ -73,7 +74,7 @@ addTaskGroup:function(tg) {
  * @param {*} tg  任务组名称
  * @param {*} task 任务详细内容
  */
- addTask:function(tg, task) {
+ addTask:function(tg, task,time) {
     text = fs.readFileSync(path.join(__dirname,dataPath))
     var data = domParser.parseFromString(text, "text/xml");
     var group = data.getElementsByName(tg);
@@ -82,6 +83,7 @@ addTaskGroup:function(tg) {
     }
     var node = data.createElement(taskName);
     node.setAttribute(finishName,false)
+    node.setAttribute(timeName,time)
     node.textContent = task;
     group[0].appendChild(node)
     fs.writeFileSync(path.join(__dirname,dataPath),new XMLSerializer().serializeToString(data))
@@ -139,10 +141,10 @@ finishTask:function(tg, id) {
         var node = tasks[j];
         fv= node.getAttribute(finishName)
         if( fv==undefined || fv==null){
-            taskList.push({ key:j,value:node.textContent,finish:false });
+            taskList.push({ key:j,value:node.textContent,finish:false,time:node.getAttribute(timeName) });
             continue;
         }
-        taskList.push({ key:j,value:node.textContent,finish:fv=="true"?true:false});
+        taskList.push({ key:j,value:node.textContent,finish:fv=="true"?true:false,time:node.getAttribute(timeName) });
     }
     return taskList;
  }

@@ -31,6 +31,7 @@
     </style>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.10/js/uikit.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.10/css/uikit.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.10/js/uikit-icons.min.js"></script>
 
 </head>
@@ -49,10 +50,31 @@
         <div class="midbox">
             <div id="addTask">
                 <p uk-margin>
-                    <a id="js-task-prompt" class="uk-button uk-button-default" href="#">新增任务</a>
+                    <a id="js-task-prompt" class="uk-button uk-button-default" href="#modal-sections" uk-toggle>新增任务</a>
                 </p>
             </div>
             <div id="taskList"></div>
+            <div id="modal-sections" uk-modal>
+                <div class="uk-modal-dialog">
+                    <button class="uk-modal-close-default" type="button" uk-close></button>
+                    <div class="uk-modal-header">
+                        <h3 class="uk-modal-title">新增任务</h3>
+                    </div>
+                    <div class="uk-modal-body">
+                        <div class="uk-margin">
+                            <span class="uk-label">任务内容:</span>
+                            <input id="taskName" class="uk-input uk-width-1-2" type="text" placeholder="50">
+                            <br/>
+                            <span class="uk-label">完成时间:</span>
+                            <input id="finishTaskTime" type="datetime-local"/>
+                        </div>
+                    </div>
+                    <div class="uk-modal-footer uk-text-right">
+                        <button class="uk-button uk-button-default uk-modal-close" type="button">取消</button>
+                        <button class="uk-button uk-button-primary uk-modal-close" type="button" onclick="okTask(this);">保存</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -60,7 +82,7 @@
 
 
     <!-- UIkit CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.10/css/uikit.min.css" />
+    
     <!-- UIkit JS -->
     <!-- <script src = "./script/data.js" type="text/javascript" /> -->
     <script type="text/javascript">
@@ -103,29 +125,37 @@
                 });
             });
 
-            UIkit.util.on('#js-task-prompt', 'click', function (e) {
-                e.preventDefault();
-                e.target.blur();
-                UIkit.modal.prompt('Name:', 'Task name').then(function (name) {
-                    console.log('Prompted:', name)
-                    if (name == undefined || name == null) return;
-                    // 添加任务
-                    addTask(PUBLIC_GROUP, name);
-                });
-            });
+            // UIkit.util.on('#js-task-prompt', 'click', function (e) {
+            // e.preventDefault();
+            // e.target.blur();
+            // UIkit.modal.prompt('Name:', 'Task name').then(function (name) {
+            // console.log('Prompted:', name)
+            // if (name == undefined || name == null) return;
+            // 添加任务
+
+
         }
         window.onload = initBEWindow;
 
-        function clickShowTasks(el,tg) {
+ 
+        function okTask(e) {
+            taskContent = document.getElementById('taskName');
+            finishTime = document.getElementById('finishTaskTime');
+            addTask(PUBLIC_GROUP, taskContent.value,finishTime.value);
+            taskContent.value=null;
+            finishTime.value=null;
+        }
+
+        function clickShowTasks(el, tg) {
             // 初始化样式
-            if(el!=null){
+            if (el != null) {
                 cnodes = el.parentNode.childNodes;
-                for(var i=0;i<cnodes.length;i++){
-                    cnodes[i].setAttribute("style","font-weight:normal;")
+                for (var i = 0; i < cnodes.length; i++) {
+                    cnodes[i].setAttribute("style", "font-weight:normal;")
                 }
-                el.setAttribute("style","font-weight:bold;color:#2719a0;font-size:25px")
+                el.setAttribute("style", "font-weight:bold;color:#2719a0;font-size:25px")
             }
-        
+
             //设置公共的tg
             PUBLIC_GROUP = tg;
             tasks = data_module.viewTaskByGroupName(tg);
@@ -133,28 +163,51 @@
             var taskTool = document.getElementById("taskList");
             taskTool.innerHTML = "";
             for (var k = 0; k < tasks.length; k++) {
-                div = document.createElement("div");
-                div.setAttribute('class', "uk-alert-primary")
-                div.setAttribute('uk-alert', true)
+                var div = document.createElement("div");
+                div.setAttribute('class', "uk-text-center uk-grid-small")
+                div.setAttribute('uk-grid', true)
+
                 span = document.createElement("span");
                 span.setAttribute('uk-icon', "icon:check;")
                 span.setAttribute('class-icon', "uk-margin-small-right")
                 span.setAttribute('onclick', "finishTask('" + tg + "'," + tasks[k].key + ")")
 
+                var div1 = document.createElement("div");
+                div1.setAttribute('class', "uk-width-2-30")
+                div1.appendChild(span);
+
+                var div2 = document.createElement("div");
+                div2.setAttribute('class', "uk-width-4-30")
+
+                var div3 = document.createElement("div");
+                div3.setAttribute('class', "uk-width-23-30")
+
+                var div4 = document.createElement("div");
+                div4.setAttribute('class', "uk-width-2-30")
+
                 a = document.createElement("a");
                 a.setAttribute('class', "uk-alert-close")
                 a.setAttribute('uk-close', true)
                 a.setAttribute('onclick', "delTask('" + tg + "'," + tasks[k].key + ")")
-                p = document.createElement("p");
-                div.appendChild(span)
-                div.appendChild(a)
-                div.appendChild(p)
+
+                var div3_1 = document.createElement("div");
+                div3_1.setAttribute('class', "uk-card uk-card-default uk-card-body")
+                div3.appendChild(div3_1)
+
+                div4.appendChild(a);
+
+                div.appendChild(div1)
+                div.appendChild(div2)
+                div.appendChild(div3)
+                div.appendChild(div4)
+                
                 if (tasks[k].finish) {
-                    p.textContent = "[完成] " + tasks[k].value;
-                    p.setAttribute("style", "text-decoration: line-through;")
+                    div3_1.textContent = "[完成] " + tasks[k].value;
+                    div3_1.setAttribute("style", "text-decoration: line-through;")
                     taskTool.appendChild(div);
                 } else {
-                    p.textContent = "[未完成] " + tasks[k].value;
+                    div2.appendChild(descTime(tasks[k].time));
+                    div3_1.textContent = "[未完成] " + tasks[k].value;
                     firstchild = taskTool.firstChild
                     if (firstchild == undefined || firstchild == null) {
                         taskTool.appendChild(div);
@@ -162,7 +215,6 @@
                     }
                     taskTool.insertBefore(div, firstchild)
                 }
-                //    li.textContent = tasks[k].value;
 
 
 
@@ -171,17 +223,17 @@
 
         function delTask(tg, id) {
             data_module.delTask(tg, id)
-            clickShowTasks(null,tg);
+            clickShowTasks(null, tg);
         }
 
         function finishTask(tg, id) {
             data_module.finishTask(tg, id)
-            clickShowTasks(null,tg);
+            clickShowTasks(null, tg);
         }
 
-        function addTask(tg, text) {
-            data_module.addTask(tg, text)
-            clickShowTasks(null,tg);
+        function addTask(tg, text,time) {
+            data_module.addTask(tg, text,time)
+            clickShowTasks(null, tg);
         }
         function addGroup(tg) {
             data_module.addTaskGroup(tg);
@@ -192,7 +244,49 @@
             data_module.delTaskGroup(tg);
             initTaskGroup();
         }
+        function divSeparator(){
+            var div0= document.createElement("div");
+            div0.setAttribute("class","uk-countdown-separator");
+            div0.textContent=":";
+            return div0;
+        }
 
+        function descTime(time){
+            div = document.createElement("div");
+            div.setAttribute("class","uk-grid-small uk-child-width-auto uk-margin");
+            div.setAttribute("uk-grid",true);
+            div.setAttribute("uk-countdown","date:"+time);
+
+            div0= document.createElement("div");
+            div_day= document.createElement("div");
+            div_day.setAttribute("class","uk-countdown-number uk-countdown-days");
+            div0.appendChild(div_day)
+
+            div1= document.createElement("div");
+            div_hour= document.createElement("div");
+            div_hour.setAttribute("class","uk-countdown-number uk-countdown-hours");
+            div1.appendChild(div_hour)
+
+            div2= document.createElement("div");
+            minutes= document.createElement("div");
+            minutes.setAttribute("class","uk-countdown-number uk-countdown-minutes");
+            div2.appendChild(minutes)
+
+            div3= document.createElement("div");
+            seconds= document.createElement("div");
+            seconds.setAttribute("class","uk-countdown-number uk-countdown-seconds");
+            div3.appendChild(seconds)
+
+            div.appendChild(div0);
+            div.appendChild(divSeparator());
+            div.appendChild(div1);
+            div.appendChild(divSeparator());
+            div.appendChild(div2);
+            div.appendChild(divSeparator());
+            div.appendChild(div3);
+
+            return div;
+        }
     </script>
 
 </body>
