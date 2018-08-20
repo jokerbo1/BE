@@ -17,9 +17,10 @@
         }
 
         .midbox {
-            width: 70%;
+            width: 78%;
             float: left;
-            background-color: #429292;
+            background-color:rgba(red, green, blue, alpha);
+            margin-left: 10px;
         }
 
         /* 按钮居中 */
@@ -28,6 +29,102 @@
             align-content: center;
             text-align: center;
         }
+
+        [class~=uk-countdown-number] span {
+            font-size: 13px;
+        }
+
+        .leftDiv {
+            margin-top: 8px;
+            font-size: 16px;
+            width:2%;
+            float: left;
+            vertical-align:top;
+            margin-left: 3px;
+        }
+        .middleDiv {
+            margin-top: 8px;
+            display: inline-block;
+            font-size: 16px;
+            width:40%;
+            margin-left: 30%;
+            height: 24px;
+            float:none;
+            vertical-align:top;
+            /* clear:none; */
+        }
+        .middleDiv>div {
+            font-size: 16px;
+            color: red;
+            height: 16px;
+            /* margin-top: 0px; */
+            /* padding: 0%; */
+            /* vertical-align: top; */
+            /* display:inline-block; */
+            width:100%;
+            line-height: 10px; /* 这个属性必须控制好，否则不展示倒计时 */
+            /* clear:none; */
+        }
+        .middleDiv>div div {
+            font-size: 16px;
+            color: red;
+            height: 16px;
+            /* margin-top: 0px; */
+            /* padding: 0%; */
+            /* vertical-align: top; */
+            /* display:inline-block; */
+            width:21px;
+            line-height: 10px; /* 这个属性必须控制好，否则不展示倒计时 */
+            /* clear:none; */
+        }
+        /* .uk-countdown-separator { */
+            /* font-size: 16px; */
+            /* color: red; */
+            /* height: 16px; */
+            /* margin-top: 0px; */
+            /* padding: 0%; */
+            /* vertical-align: top; */
+            /* display:inline-block; */
+            /* width:4px; */
+            /* line-height: 10px; 这个属性必须控制好，否则不展示倒计时 */
+            /* clear:none; */
+        /* } */
+        .middleDiv span {
+            /* font-size: 16px; */
+            color: rgb(136, 255, 0);
+            background-color:rgb(red, green, blue);
+            height: 16px;
+            margin-top: 0px;
+            padding: 0%;
+            /* vertical-align: top; */
+            display:inline-block;
+            width:10px;
+            
+            /* display: block; */
+            /* clear:none; */
+        }
+        .rightDiv {
+            margin-top: 8px;
+            font-size: 16px;
+            /* width:10px; */
+            margin-left: 10px;
+            float: right;
+            vertical-align:top;
+            /* display: inline-block; */
+            overflow: auto;
+            /* clear:both; */
+        }
+        .taskDiv {
+            font-size: 16px;
+            width:100%;
+            float: left;
+            margin-top: 1px;
+        }
+        .clearBothDiv {
+             clear:both;
+             margin-top: 8px;
+        }
+        /* div3.setAttribute('class', "leftDiv") */
     </style>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.10/js/uikit.min.js"></script>
@@ -53,7 +150,7 @@
                     <a id="js-task-prompt" class="uk-button uk-button-default" href="#modal-sections" uk-toggle>新增任务</a>
                 </p>
             </div>
-            <div id="taskList"></div>
+            <div id="taskList" style="width:100%;"></div>
             <div id="modal-sections" uk-modal>
                 <div class="uk-modal-dialog">
                     <button class="uk-modal-close-default" type="button" uk-close></button>
@@ -63,7 +160,7 @@
                     <div class="uk-modal-body">
                         <div class="uk-margin">
                             <span class="uk-label">任务内容:</span>
-                            <input id="taskName" class="uk-input uk-width-1-2" type="text" placeholder="50">
+                            <textarea id="taskName" class="uk-input" type="text" placeholder="50"></textarea>
                             <br/>
                             <span class="uk-label">完成时间:</span>
                             <input id="finishTaskTime" type="datetime-local"/>
@@ -125,15 +222,6 @@
                 });
             });
 
-            // UIkit.util.on('#js-task-prompt', 'click', function (e) {
-            // e.preventDefault();
-            // e.target.blur();
-            // UIkit.modal.prompt('Name:', 'Task name').then(function (name) {
-            // console.log('Prompted:', name)
-            // if (name == undefined || name == null) return;
-            // 添加任务
-
-
         }
         window.onload = initBEWindow;
 
@@ -141,6 +229,12 @@
         function okTask(e) {
             taskContent = document.getElementById('taskName');
             finishTime = document.getElementById('finishTaskTime');
+            if(taskContent.value==null||taskContent.value==""){
+                UIkit.notification({message: '任务内容为空',status: 'danger',pos: 'top-right'})
+                taskContent.value=null;
+                finishTime.value=null;
+                return
+            }
             addTask(PUBLIC_GROUP, taskContent.value,finishTime.value);
             taskContent.value=null;
             finishTime.value=null;
@@ -164,56 +258,61 @@
             taskTool.innerHTML = "";
             for (var k = 0; k < tasks.length; k++) {
                 var div = document.createElement("div");
-                div.setAttribute('class', "uk-text-center uk-grid-small")
-                div.setAttribute('uk-grid', true)
-
+                // div.setAttribute('class', "uk-grid-match uk-child-width-expand@s")
+                div.setAttribute('class', "clearBothDiv")
+                spandiv= document.createElement("div");
+                spandiv.setAttribute('class', "leftDiv")
                 span = document.createElement("span");
                 span.setAttribute('uk-icon', "icon:check;")
                 span.setAttribute('class-icon', "uk-margin-small-right")
                 span.setAttribute('onclick', "finishTask('" + tg + "'," + tasks[k].key + ")")
+                spandiv.appendChild(span)
 
-                var div1 = document.createElement("div");
-                div1.setAttribute('class', "uk-width-2-30")
-                div1.appendChild(span);
+                var clockdiv = document.createElement("div");
+                clockdiv.setAttribute('class', "middleDiv")
 
-                var div2 = document.createElement("div");
-                div2.setAttribute('class', "uk-width-4-30")
+                var textdiv = document.createElement("div");
+                textdiv.setAttribute('class', "leftDiv")
+
+                var adiv = document.createElement("div");
+                adiv.setAttribute('class', "rightDiv")
+                a = document.createElement("span");
+                a.setAttribute('class', "uk-margin-small-right")
+                a.setAttribute('uk-icon', "close")
+                a.setAttribute('onclick', "delTask('" + tg + "'," + tasks[k].key + ")")
+                adiv.appendChild(a)
 
                 var div3 = document.createElement("div");
-                div3.setAttribute('class', "uk-width-23-30")
-
-                var div4 = document.createElement("div");
-                div4.setAttribute('class', "uk-width-2-30")
-
-                a = document.createElement("a");
-                a.setAttribute('class', "uk-alert-close")
-                a.setAttribute('uk-close', true)
-                a.setAttribute('onclick', "delTask('" + tg + "'," + tasks[k].key + ")")
-
+                div3.setAttribute('class', "taskDiv")
                 var div3_1 = document.createElement("div");
                 div3_1.setAttribute('class', "uk-card uk-card-default uk-card-body")
                 div3.appendChild(div3_1)
 
-                div4.appendChild(a);
-
-                div.appendChild(div1)
-                div.appendChild(div2)
+                div.appendChild(spandiv)
+                div.appendChild(clockdiv)
+                div.appendChild(adiv)
                 div.appendChild(div3)
-                div.appendChild(div4)
+                
                 
                 if (tasks[k].finish) {
                     div3_1.textContent = "[完成] " + tasks[k].value;
                     div3_1.setAttribute("style", "text-decoration: line-through;")
                     taskTool.appendChild(div);
+                    taskTool.appendChild(brEl());
                 } else {
-                    div2.appendChild(descTime(tasks[k].time));
+                    ttime = tasks[k].time;
+                    if(ttime!=null && ttime!="" && ttime!=undefined){
+                        clockdiv.appendChild(descTime(tasks[k].time));
+                    }
                     div3_1.textContent = "[未完成] " + tasks[k].value;
                     firstchild = taskTool.firstChild
                     if (firstchild == undefined || firstchild == null) {
                         taskTool.appendChild(div);
+                        taskTool.appendChild(brEl())
                         continue;
                     }
-                    taskTool.insertBefore(div, firstchild)
+                    taskTool.insertBefore(div, firstchild);
+                    taskTool.insertBefore(brEl(),firstchild);
                 }
 
 
@@ -246,17 +345,22 @@
         }
         function divSeparator(){
             var div0= document.createElement("div");
-            div0.setAttribute("class","uk-countdown-separator");
+            // div0.setAttribute("class","uk-countdown-separator");
+            div0.setAttribute("style","width:4px;");
             div0.textContent=":";
             return div0;
         }
 
+        function brEl(){
+            br = document.createElement("br");
+            return br;
+        }
         function descTime(time){
             div = document.createElement("div");
             div.setAttribute("class","uk-grid-small uk-child-width-auto uk-margin");
             div.setAttribute("uk-grid",true);
             div.setAttribute("uk-countdown","date:"+time);
-
+            div.textContent="完成倒计时: ";
             div0= document.createElement("div");
             div_day= document.createElement("div");
             div_day.setAttribute("class","uk-countdown-number uk-countdown-days");
@@ -284,6 +388,7 @@
             div.appendChild(div2);
             div.appendChild(divSeparator());
             div.appendChild(div3);
+            // div.setAttribute("style","font-size:13px;width:100%");
 
             return div;
         }
